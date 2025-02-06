@@ -94,8 +94,12 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),  # PostgreSQL 컨테이너의 데이터베이스 이름
+        'USER': env('DB_USER'),  # PostgreSQL 컨테이너의 유저 이름
+        'PASSWORD': env('DB_PASSWORD'),  # PostgreSQL 컨테이너의 비밀번호
+        'HOST': env('DB_HOST'),  # PostgreSQL 컨테이너의 호스트
+        'PORT': env('DB_PORT'),  # PostgreSQL 컨테이너의 포트
     }
 }
 
