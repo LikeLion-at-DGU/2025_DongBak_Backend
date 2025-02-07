@@ -2,7 +2,7 @@
 FROM python:3.13
 
 # 2. 작업 디렉토리 설정
-WORKDIR /app
+WORKDIR /
 
 # 3. 빌드 시 환경 변수 전달받기
 ARG SECRET_KEY
@@ -21,7 +21,7 @@ ENV DB_HOST=${DB_HOST}
 ENV DB_PORT=${DB_PORT}
 
 # 5. 로컬의 Django 프로젝트 파일을 컨테이너 내부로 복사
-COPY . /app/
+COPY . /
 
 # 6. 패키지 설치
 RUN pip install --upgrade pip && pip install -r requirements.txt
