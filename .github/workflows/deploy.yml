@@ -43,17 +43,41 @@ jobs:
             echo "🔄 기존 컨테이너 중지 및 삭제..."
             docker stop dongbak_backend || true
             docker rm dongbak_backend || true
-            
+            docker stop nginx_proxy || true
+            docker rm nginx_proxy || true
+
             echo "🧹 불필요한 Docker 이미지 정리..."
             docker image prune -a -f
 
-            echo "⬇️ 최신 Docker 이미지 Pull..."
+            echo "⬇️ 최신 Django 컨테이너 Pull..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
-            echo "🚀 새로운 컨테이너 실행..."
-            docker run -d --name dongbak_backend -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
+            echo "🚀 Django 컨테이너 실행..."
+            docker run -d --name dongbak_backend \
+              -p 8000:8000 \
+              -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -v /home/ubuntu/static:/app/staticfiles \
+              ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
             echo "🛠 데이터베이스 마이그레이션 실행..."
             docker exec dongbak_backend python manage.py migrate
+
+            echo "📂 Django collectstatic 실행..."
+            docker exec -it dongbak_backend python manage.py collectstatic --noinput
+
+            echo "⬇️ 최신 Nginx 컨테이너 Pull..."
+            docker pull nginx:latest
+
+            echo "🚀 Nginx 컨테이너 실행..."
+            docker run -d --name nginx_proxy \
+              -p 80:80 \
+              -v /home/ubuntu/nginx.conf:/etc/nginx/nginx.conf:ro \
+              -v /home/ubuntu/static:/static \
+              nginx:latest
 
             echo "✅ 배포 완료!"
