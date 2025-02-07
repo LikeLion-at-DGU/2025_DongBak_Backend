@@ -2,17 +2,33 @@
 FROM python:3.13
 
 # 2. 작업 디렉토리 설정
-WORKDIR /
+WORKDIR /app
 
-# 3. 로컬의 Django 프로젝트 파일을 컨테이너 내부로 복사
-COPY . /
+# 3. 빌드 시 환경 변수 전달받기
+ARG SECRET_KEY
+ARG DB_NAME
+ARG DB_USER
+ARG DB_PASSWORD
+ARG DB_HOST
+ARG DB_PORT
 
-# 4. 필요한 패키지 설치
+# 4. 환경 변수를 Docker 컨테이너 내부에 설정
+ENV SECRET_KEY=${SECRET_KEY}
+ENV DB_NAME=${DB_NAME}
+ENV DB_USER=${DB_USER}
+ENV DB_PASSWORD=${DB_PASSWORD}
+ENV DB_HOST=${DB_HOST}
+ENV DB_PORT=${DB_PORT}
+
+# 5. 로컬의 Django 프로젝트 파일을 컨테이너 내부로 복사
+COPY . /app/
+
+# 6. 패키지 설치
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# 5. 장고 마이그레이션 (DB 세팅)
+# 7. Django 정적 파일 수집 및 마이그레이션 (빌드 시)
 RUN python manage.py collectstatic --noinput
 RUN python manage.py migrate
 
-# 6. 컨테이너 실행 시 Django 서버 실행
+# 8. Gunicorn 실행 (Django 서버 실행)
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "project.wsgi:application"]

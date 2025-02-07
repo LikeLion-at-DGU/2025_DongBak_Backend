@@ -18,10 +18,18 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # 3️⃣ Docker 이미지 빌드 및 Docker Hub에 푸시
+      # 3️⃣ Docker 이미지 빌드 및 Docker Hub에 푸시 (빌드 시 GitHub Secrets 사용)
       - name: Build and Push Docker Image
         run: |
-          docker build --platform linux/amd64 -t ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest .
+          docker build --platform linux/amd64 \
+            --build-arg SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            --build-arg DB_NAME="${{ secrets.DB_NAME }}" \
+            --build-arg DB_USER="${{ secrets.DB_USER }}" \
+            --build-arg DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            --build-arg DB_HOST="${{ secrets.DB_HOST }}" \
+            --build-arg DB_PORT="${{ secrets.DB_PORT }}" \
+            -t ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest .
+          
           docker push ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
       # 4️⃣ EC2 서버에 SSH 접속 후 최신 컨테이너 배포
@@ -44,5 +52,8 @@ jobs:
 
             echo "🚀 새로운 컨테이너 실행..."
             docker run -d --name dongbak_backend --env-file /home/ubuntu/.env -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
+
+            echo "🛠 데이터베이스 마이그레이션 실행..."
+            docker exec dongbak_backend python manage.py migrate
 
             echo "✅ 배포 완료!"
