@@ -51,7 +51,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
             echo "🚀 새로운 컨테이너 실행..."
-            docker run -d --name dongbak_backend --env-file /home/ubuntu/.env -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
+            docker run -d --name dongbak_backend -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
             echo "🛠 데이터베이스 마이그레이션 실행..."
             docker exec dongbak_backend python manage.py migrate
