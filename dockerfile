@@ -27,7 +27,6 @@ COPY . /
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # 7. Django 정적 파일 수집 및 마이그레이션 (빌드 시)
-RUN python manage.py collectstatic --noinput
 RUN python manage.py migrate
 
 # 8. Gunicorn 실행 (Django 서버 실행)

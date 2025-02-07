@@ -56,7 +56,14 @@ jobs:
             -v /home/ubuntu/static:/static \
             mmig01/dongbak2025:latest
 
+            
             echo "🛠 데이터베이스 마이그레이션 실행..."
             docker exec dongbak_backend python manage.py migrate
+
+            echo "📂 Django collectstatic 실행..."
+            docker exec -it dongbak_backend python manage.py collectstatic --noinput
+
+            echo "✅ Nginx 재시작..."
+            sudo systemctl restart nginx
 
             echo "✅ 배포 완료!"
