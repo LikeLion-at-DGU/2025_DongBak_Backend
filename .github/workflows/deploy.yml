@@ -55,13 +55,6 @@ jobs:
             echo "🚀 Django 컨테이너 실행..."
             docker run -d --name dongbak_backend \
               -p 8000:8000 \
-              -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
-              -e DB_NAME=${{ secrets.DB_NAME }} \
-              -e DB_USER=${{ secrets.DB_USER }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e DB_HOST=${{ secrets.DB_HOST }} \
-              -e DB_PORT=${{ secrets.DB_PORT }} \
-              -v /home/ubuntu/static:/app/staticfiles \
               ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
             echo "🛠 데이터베이스 마이그레이션 실행..."
