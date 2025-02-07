@@ -32,7 +32,7 @@ jobs:
           
           docker push ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
-      # 4️⃣ EC2 서버에 SSH 접속 후 최신 컨테이너 배포
+      # 4️⃣ EC2 서버에 SSH 접속 후 배포 실행
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@master
         with:
@@ -41,19 +41,21 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             echo "🔄 기존 컨테이너 중지 및 삭제..."
-            docker stop dongbak_backend || true
-            docker rm dongbak_backend || true
-            
+            docker-compose down
+
             echo "🧹 불필요한 Docker 이미지 정리..."
             docker image prune -a -f
 
             echo "⬇️ 최신 Docker 이미지 Pull..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
-            echo "🚀 새로운 컨테이너 실행..."
-            docker run -d --name dongbak_backend -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
+            echo "🚀 `docker-compose`로 컨테이너 실행..."
+            docker-compose up -d --build
 
             echo "🛠 데이터베이스 마이그레이션 실행..."
-            docker exec dongbak_backend python manage.py migrate
+            docker exec django_backend python manage.py migrate
+
+            echo "✅ Nginx 재시작..."
+            sudo systemctl restart nginx
 
             echo "✅ 배포 완료!"
