@@ -143,3 +143,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CSRF 보호를 위해 신뢰할 수 있는 Origin 추가
+CSRF_TRUSTED_ORIGINS = [
+    "https://dongbak2025.shop",  
+    "http://dongbak2025.shop",  # HTTP와 HTTPS 둘 다 추가
+]
