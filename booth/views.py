@@ -7,8 +7,8 @@ from .serializers import *
 class BoothViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.action == "foodtruck_by_day":
-            return FoodTruck.objects.all()
-        return Booth.objects.all()
+            return FoodTruck.objects.all().order_by('booth_num')
+        return Booth.objects.all().order_by('booth_num')
     def get_serializer_class(self):
         if self.action in ["list", "wednesday_booths", "thursday_booths", "foodtruck_by_day"]:
             return BoothListSerializer
@@ -23,14 +23,14 @@ class BoothViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"], url_path="wednesday")
     def wednesday_booths(self, request):
         """수요일 부스만 필터링하여 location별 그룹화"""
-        booths = self.get_queryset().filter(day="(수)")
+        booths = self.get_queryset().filter(day=1)
         serialized_booths = self.get_serializer(booths, many=True).data
         return Response(self.group_by_location(serialized_booths))
 
     @action(detail=False, methods=["get"], url_path="thursday")
     def thursday_booths(self, request):
         """목요일 부스만 필터링하여 location별 그룹화"""
-        booths = self.get_queryset().filter(day="(목)")
+        booths = self.get_queryset().filter(day=2)
         serialized_booths = self.get_serializer(booths, many=True).data
         return Response(self.group_by_location(serialized_booths))
 

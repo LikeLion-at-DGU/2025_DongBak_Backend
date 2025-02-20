@@ -2,6 +2,12 @@ from django.conf import settings
 from .models import *
 from rest_framework import serializers
 
+class DaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Day
+        fields = ['name']
+    
+
 class BoothImageSerializer(serializers.ModelSerializer):
     booth = serializers.PrimaryKeyRelatedField(queryset=Booth.objects.all())
     image = serializers.ImageField(use_url=True)
@@ -62,6 +68,11 @@ class BoothSerializer(serializers.ModelSerializer):
         if obj.end_recruitment:
             return obj.end_recruitment.strftime("%m월 %d일 (%a)").replace("Mon", "월").replace("Tue", "화").replace("Wed", "수").replace("Thu", "목").replace("Fri", "금").replace("Sat", "토").replace("Sun", "일")
         return None
+    
+    day = serializers.PrimaryKeyRelatedField(
+        queryset=Day.objects.all(), many=True, write_only=True
+    )
+    day_display = DaySerializer(many=True, read_only=True, source="day")
 
 class BoothListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,6 +87,12 @@ class BoothListSerializer(serializers.ModelSerializer):
     start_time = serializers.TimeField(format="%H:%M")
     end_time = serializers.TimeField(format="%H:%M")
 
+    day = serializers.SerializerMethodField()
+    def get_day(self, instance):
+        serializer = DaySerializer(instance.day.all(), many=True)
+        return serializer.data
+
+
 class FoodTruckSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoodTruck
@@ -88,3 +105,8 @@ class FoodTruckSerializer(serializers.ModelSerializer):
         return FoodTruckImageSerializer(instance=image, many=True, context=self.context).data
     start_time = serializers.TimeField(format="%H:%M")
     end_time = serializers.TimeField(format="%H:%M")
+
+    day = serializers.PrimaryKeyRelatedField(
+        queryset=Day.objects.all(), many=True, write_only=True
+    )
+    day_display = DaySerializer(many=True, read_only=True, source="day")

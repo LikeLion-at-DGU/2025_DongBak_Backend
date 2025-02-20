@@ -4,6 +4,17 @@ from django.db import models
 def image_upload_path(instance, filename):
     return f'{instance.pk}/{filename}'
 
+class Day(models.Model):
+    DAY_CHOICES = [
+        (None, ''),
+        ('수', '(수)'),
+        ('목', '(목)')
+    ]
+    name = models.CharField(max_length=10, choices=DAY_CHOICES, default='', unique=True)
+
+    def __str__(self):
+        return self.name
+
 class Booth(models.Model):
     BOOTH_DAY = [
         (None, ''),
@@ -18,7 +29,7 @@ class Booth(models.Model):
     id = models.AutoField(primary_key=True)
     club_name = models.CharField(max_length=50)
     booth_name = models.CharField(max_length=50)
-    day = models.CharField(max_length=20, choices=BOOTH_DAY, default='')
+    day = models.ManyToManyField(Day)
     location = models.CharField(max_length=30, choices=BOOTH_LOCATION, default='')
     booth_num = models.IntegerField()
     start_time = models.TimeField()
@@ -33,11 +44,6 @@ class Booth(models.Model):
     insta_url = models.CharField(max_length=200, blank=True, null=True)
 
 class FoodTruck(models.Model):
-    FOODTRUCK_DAY = [
-        (None, ''),
-        ('(수)', '(수)'),
-        ('(목)', '(목)')
-    ]
     FOODTRUCK_LOCATION = [
         (None, ''),
         ('만해광장', '만해광장'),
@@ -45,7 +51,7 @@ class FoodTruck(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     food_truck_name = models.CharField(max_length=50)
-    day = models.CharField(max_length=20, choices=FOODTRUCK_DAY, default='')
+    day = models.ManyToManyField(Day)
     location = models.CharField(max_length=30, choices=FOODTRUCK_LOCATION, default='')
     food_truck_num = models.IntegerField()
     start_time = models.TimeField()
