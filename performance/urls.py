@@ -8,5 +8,9 @@ from django.conf import settings
 
 app_name = "performance"
 
+defalut_router = routers.SimpleRouter(trailing_slash=False)
+defalut_router.register("home", PerformanceViewSet, basename="home")
+
 urlpatterns = [
+    path('', include(defalut_router.urls))
 ]
