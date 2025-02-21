@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import *
 
 # Register your models here.
+admin.site.register(Day)
 admin.site.register(BoothImage)
 admin.site.register(HashTag)
 admin.site.register(Booth)
