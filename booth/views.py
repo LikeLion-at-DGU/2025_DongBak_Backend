@@ -6,6 +6,12 @@ from django.db.models import Q
 from .models import *
 from .serializers import *
 
+import os
+from django.conf import settings
+import pandas as pd
+import json
+from rest_framework.parsers import MultiPartParser, FormParser
+
 class BoothViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.action == "foodtruck_by_day":
@@ -108,17 +114,17 @@ class SearchView(APIView):
         if not query:
             return Response({"error": "검색어를 입력하세요."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Booth 검색 (club_name, booth_name, booth_discription)
+        # Booth 검색 (club_name, booth_name, booth_description)
         booth_results = Booth.objects.filter(
             Q(club_name__icontains=query) |
             Q(booth_name__icontains=query) |
-            Q(booth_discription__icontains=query)
+            Q(booth_description__icontains=query)
         ).distinct()
 
-        # FoodTruck 검색 (food_truck_name, food_truck_discription)
+        # FoodTruck 검색 (food_truck_name, food_truck_description)
         food_truck_results = FoodTruck.objects.filter(
             Q(food_truck_name__icontains=query) |
-            Q(food_truck_discription__icontains=query)
+            Q(food_truck_description__icontains=query)
         ).distinct()
 
         booth_serializer = BoothListSerializer(booth_results, context = {'request': request}, many=True)
@@ -128,3 +134,73 @@ class SearchView(APIView):
             "booths": booth_serializer.data,
             "food_trucks": food_truck_serializer.data
         }, status=status.HTTP_200_OK)
+    
+class BoothDataView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        # CSV 파일 업로드 확인
+        csv_file = request.FILES.get("file")
+        if not csv_file:
+            return Response({"error": "파일이 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # CSV 파일을 DataFrame으로 로드
+        try:
+            df = pd.read_csv(csv_file)
+        except Exception as e:
+            return Response({"error": f"파일을 읽을 수 없습니다: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 필수 컬럼 확인
+        required_columns = [
+            "부스 번호", "동아리명", "부스명", "부스 위치", "부스 시작시간", "부스 종료시간",
+            "동아리 분과", "동아리 설명", "부스 설명", "모집 시작 날짜", "모집 종료 날짜", "지원 방법", "인스타 url"
+        ]
+        if not all(col in df.columns for col in required_columns):
+            return Response({"error": "CSV 파일에 필요한 모든 열이 포함되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # JSON 파일로 저장할 데이터 정리
+        booth_data = {}
+        for _, row in df.iterrows():
+            booth_number = int(row["부스 번호"])
+            booth_data[booth_number] = {
+                "동아리명": row["동아리명"],
+                "부스명": row["부스명"],
+                "부스 위치": row["부스 위치"],
+                "부스 시작시간": row["부스 시작시간"],
+                "부스 종료시간": row["부스 종료시간"],
+                "동아리 분과": row["동아리 분과"],
+                "동아리 설명": row["동아리 설명"],
+                "부스 설명": row["부스 설명"],
+                "모집 시작 날짜": row["모집 시작 날짜"],
+                "모집 종료 날짜": row["모집 종료 날짜"],
+                "지원 방법": row["지원 방법"],
+                "인스타 url": row["인스타 url"]
+            }
+
+        # JSON 파일 저장
+        json_file_path = os.path.join(settings.BASE_DIR, 'booth', 'booths.json')
+        os.makedirs(os.path.dirname(json_file_path), exist_ok=True)
+        with open(json_file_path, 'w', encoding='utf-8') as json_file:
+            json.dump(booth_data, json_file, ensure_ascii=False, indent=4)
+
+        # 기존 데이터 삭제
+
+        # 새로운 데이터 저장
+        for booth_number, data in booth_data.items():
+            Booth.objects.create(
+                booth_num=booth_number,
+                club_name=data["동아리명"],
+                booth_name=data["부스명"],
+                location=data["부스 위치"],
+                start_time=data["부스 시작시간"],
+                end_time=data["부스 종료시간"],
+                club_category=data["동아리 분과"],
+                club_description=data["동아리 설명"],
+                booth_description=data["부스 설명"],
+                start_recruitment=data["모집 시작 날짜"],
+                end_recruitment=data["모집 종료 날짜"],
+                apply_method=data["지원 방법"],
+                insta_url=data["인스타 url"]
+            )
+
+        return Response(booth_data, status=status.HTTP_200_OK)

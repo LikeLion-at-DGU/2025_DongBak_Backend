@@ -36,8 +36,8 @@ class Booth(models.Model):
     end_time = models.TimeField()
     club_logo = models.ImageField(upload_to=image_upload_path, null=True, blank=True)
     club_category = models.CharField(max_length=20)
-    club_discription = models.CharField(max_length=250, blank=True, null=True)
-    booth_discription = models.CharField(max_length=250, blank=True, null=True)
+    club_description = models.CharField(max_length=250, blank=True, null=True)
+    booth_description = models.CharField(max_length=250, blank=True, null=True)
     start_recruitment = models.DateField()
     end_recruitment = models.DateField()
     apply_method = models.CharField(max_length=300)
@@ -56,7 +56,7 @@ class FoodTruck(models.Model):
     food_truck_num = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    food_truck_discription = models.CharField(max_length=400)
+    food_truck_description = models.CharField(max_length=400)
     insta_url = models.URLField(max_length=200, blank=True, null=True)
 
 class BoothImage(models.Model):
