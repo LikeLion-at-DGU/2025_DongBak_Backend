@@ -2,17 +2,20 @@ from django.db import models
 from booth.models import Day
 
 # Create your models here.
+def image_upload_path(instance, filename):
+    return f'{instance.pk}/{filename}'
 
 class Performance(models.Model):
-    PERFORMANCE_LOCATION = [
-        (None, ''),
-        ('만해광장', '만해광장'),
-        ('팔정도', '팔정도')
-    ]
+    # PERFORMANCE_LOCATION = [
+    #     (None, ''),
+    #     ('만해광장', '만해광장'),
+    #     ('팔정도', '팔정도')
+    # ]
     id = models.AutoField(primary_key=True)
     club_name = models.CharField(max_length=30)
     day = models.ManyToManyField(Day)
-    location = models.CharField(max_length=30, choices=PERFORMANCE_LOCATION, default='')
+    # location = models.CharField(max_length=30, choices=PERFORMANCE_LOCATION, default='')
+    logo = models.ImageField(upload_to=image_upload_path, null=True, blank=True)
     category = models.CharField(max_length=30)
     start_time = models.TimeField()
     end_time = models.TimeField()
