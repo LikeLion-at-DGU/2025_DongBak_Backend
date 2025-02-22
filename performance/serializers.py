@@ -25,6 +25,9 @@ class PerformanceSerializer(serializers.ModelSerializer):
     )
     day_display = DaySerializer(many=True, read_only=True, source="day")
     
+    logo = serializers.ImageField(use_url=True, required=False)
+
+
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song

@@ -1,6 +1,8 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
+from django.db.models import Q
 from .models import *
 from .serializers import *
 
@@ -78,14 +80,14 @@ class FoodTruckViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"], url_path="wednesday")
     def wednesday_booths(self, request):
         """수요일 푸드트럭만 필터링하여 location별 그룹화"""
-        food_trucks = self.get_queryset().filter(day="(수)")
+        food_trucks = self.get_queryset().filter(day=1)
         serialized_food_trucks = self.get_serializer(food_trucks, many=True).data
         return Response(self.group_by_location(serialized_food_trucks))
 
     @action(detail=False, methods=["get"], url_path="thursday")
     def thursday_booths(self, request):
         """목요일 푸드트럭만 필터링하여 location별 그룹화"""
-        food_trucks = self.get_queryset().filter(day="(목)")
+        food_trucks = self.get_queryset().filter(day=2)
         serialized_food_trucks = self.get_serializer(food_trucks, many=True).data
         return Response(self.group_by_location(serialized_food_trucks))
 
@@ -98,3 +100,31 @@ class FoodTruckViewSet(viewsets.ModelViewSet):
                 grouped_food_trucks[location] = []
             grouped_food_trucks[location].append(food_truck)
         return grouped_food_trucks
+    
+class SearchView(APIView):
+    def get(self, request):
+        query = request.GET.get('q', '')
+
+        if not query:
+            return Response({"error": "검색어를 입력하세요."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Booth 검색 (club_name, booth_name, booth_discription)
+        booth_results = Booth.objects.filter(
+            Q(club_name__icontains=query) |
+            Q(booth_name__icontains=query) |
+            Q(booth_discription__icontains=query)
+        ).distinct()
+
+        # FoodTruck 검색 (food_truck_name, food_truck_discription)
+        food_truck_results = FoodTruck.objects.filter(
+            Q(food_truck_name__icontains=query) |
+            Q(food_truck_discription__icontains=query)
+        ).distinct()
+
+        booth_serializer = BoothListSerializer(booth_results, context = {'request': request}, many=True)
+        food_truck_serializer = FoodTruckSerializer(food_truck_results, many=True)
+
+        return Response({
+            "booths": booth_serializer.data,
+            "food_trucks": food_truck_serializer.data
+        }, status=status.HTTP_200_OK)

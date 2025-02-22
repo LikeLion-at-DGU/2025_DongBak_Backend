@@ -16,5 +16,6 @@ food_truck_router.register("foodtruck", FoodTruckViewSet, basename="foodtruck")
 
 urlpatterns = [
     path("", include(defalut_router.urls)),
-    path("", include(food_truck_router.urls))
+    path("", include(food_truck_router.urls)),
+    path("search", SearchView.as_view(), name='search')
 ]
