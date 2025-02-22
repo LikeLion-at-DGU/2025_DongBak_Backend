@@ -25,14 +25,11 @@ class HashTagSerializer(serializers.ModelSerializer):
 
 class FoodTruckImageSerializer(serializers.ModelSerializer):
     food_truck = serializers.PrimaryKeyRelatedField(queryset=FoodTruck.objects.all())
-    image = serializers.SerializerMethodField()
+    image = serializers.ImageField(use_url=True)
     
     class Meta:
         model = FoodTruckImage
         fields = ['id', 'food_truck', 'image']
-    
-    def get_image(self, obj):
-        return self.context['request'].build_absolute_uri(obj.image.url)
     
 
 class BoothSerializer(serializers.ModelSerializer):
@@ -79,7 +76,7 @@ class BoothListSerializer(serializers.ModelSerializer):
         model = Booth
         fields = ['id', 'booth_image', 'booth_name', 'club_name', 'day', 'start_time', 'end_time', 'location', 'booth_num']
         read_only_fields = ['id']
-
+    
     booth_image = serializers.SerializerMethodField()
     def get_booth_image(self, obj):
         first_image = obj.image.first()
