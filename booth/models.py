@@ -16,11 +16,6 @@ class Day(models.Model):
         return self.name
 
 class Booth(models.Model):
-    BOOTH_DAY = [
-        (None, ''),
-        ('(수)', '(수)'),
-        ('(목)', '(목)')
-    ]
     BOOTH_LOCATION = [
         (None, ''),
         ('만해광장', '만해광장'),
@@ -31,7 +26,7 @@ class Booth(models.Model):
     booth_name = models.CharField(max_length=50)
     day = models.ManyToManyField(Day)
     location = models.CharField(max_length=30, choices=BOOTH_LOCATION, default='')
-    booth_num = models.IntegerField()
+    booth_num = models.IntegerField(unique=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
     club_logo = models.ImageField(upload_to=image_upload_path, null=True, blank=True)

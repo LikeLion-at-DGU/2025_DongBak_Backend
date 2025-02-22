@@ -153,15 +153,37 @@ class BoothDataView(APIView):
         # 필수 컬럼 확인
         required_columns = [
             "부스 번호", "동아리명", "부스명", "부스 위치", "부스 시작시간", "부스 종료시간",
-            "동아리 분과", "동아리 설명", "부스 설명", "모집 시작 날짜", "모집 종료 날짜", "지원 방법", "인스타 url"
+            "동아리 분과", "동아리 설명", "부스 설명", "모집 시작 날짜", "모집 종료 날짜", "지원 방법", "인스타 url", "day"
         ]
         if not all(col in df.columns for col in required_columns):
             return Response({"error": "CSV 파일에 필요한 모든 열이 포함되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        Booth.objects.all().delete()  # 기존 데이터 삭제
 
-        # JSON 파일로 저장할 데이터 정리
         booth_data = {}
         for _, row in df.iterrows():
             booth_number = int(row["부스 번호"])
+            booth = Booth.objects.create(
+                booth_num=booth_number,
+                club_name=row["동아리명"],
+                booth_name=row["부스명"],
+                location=row["부스 위치"],
+                start_time=row["부스 시작시간"],
+                end_time=row["부스 종료시간"],
+                club_category=row["동아리 분과"],
+                club_description=row["동아리 설명"],
+                booth_description=row["부스 설명"],
+                start_recruitment=row["모집 시작 날짜"],
+                end_recruitment=row["모집 종료 날짜"],
+                apply_method=row["지원 방법"],
+                insta_url=row["인스타 url"]
+            )
+
+            days = row["day"].split(",")
+            for day_name in days:
+                day_obj, created = Day.objects.get_or_create(name=day_name.strip())
+                booth.day.add(day_obj)
+
             booth_data[booth_number] = {
                 "동아리명": row["동아리명"],
                 "부스명": row["부스명"],
@@ -174,33 +196,8 @@ class BoothDataView(APIView):
                 "모집 시작 날짜": row["모집 시작 날짜"],
                 "모집 종료 날짜": row["모집 종료 날짜"],
                 "지원 방법": row["지원 방법"],
-                "인스타 url": row["인스타 url"]
+                "인스타 url": row["인스타 url"],
+                "day": days 
             }
-
-        # JSON 파일 저장
-        json_file_path = os.path.join(settings.BASE_DIR, 'booth', 'booths.json')
-        os.makedirs(os.path.dirname(json_file_path), exist_ok=True)
-        with open(json_file_path, 'w', encoding='utf-8') as json_file:
-            json.dump(booth_data, json_file, ensure_ascii=False, indent=4)
-
-        # 기존 데이터 삭제
-
-        # 새로운 데이터 저장
-        for booth_number, data in booth_data.items():
-            Booth.objects.create(
-                booth_num=booth_number,
-                club_name=data["동아리명"],
-                booth_name=data["부스명"],
-                location=data["부스 위치"],
-                start_time=data["부스 시작시간"],
-                end_time=data["부스 종료시간"],
-                club_category=data["동아리 분과"],
-                club_description=data["동아리 설명"],
-                booth_description=data["부스 설명"],
-                start_recruitment=data["모집 시작 날짜"],
-                end_recruitment=data["모집 종료 날짜"],
-                apply_method=data["지원 방법"],
-                insta_url=data["인스타 url"]
-            )
 
         return Response(booth_data, status=status.HTTP_200_OK)
