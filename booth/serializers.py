@@ -16,12 +16,12 @@ class BoothImageSerializer(serializers.ModelSerializer):
         model = BoothImage
         fields = ['id', 'booth', 'image']
 
-class HashTagSerializer(serializers.ModelSerializer):
-    booth = serializers.PrimaryKeyRelatedField(queryset=Booth.objects.all())
+# class HashTagSerializer(serializers.ModelSerializer):
+#     booth = serializers.PrimaryKeyRelatedField(queryset=Booth.objects.all())
 
-    class Meta:
-        model = HashTag
-        fields = ['id', 'booth', 'name']
+#     class Meta:
+#         model = HashTag
+#         fields = ['id', 'booth', 'name']
 
 class FoodTruckImageSerializer(serializers.ModelSerializer):
     food_truck = serializers.PrimaryKeyRelatedField(queryset=FoodTruck.objects.all())
@@ -46,10 +46,10 @@ class BoothSerializer(serializers.ModelSerializer):
         image = obj.image.all()
         return BoothImageSerializer(instance=image, many=True, context=self.context).data
     
-    hash_tag = serializers.SerializerMethodField()
-    def get_hash_tag(self, obj):
-        tags = obj.tags.all()
-        return HashTagSerializer(instance=tags, many = True, context=self.context).data
+    # hash_tag = serializers.SerializerMethodField()
+    # def get_hash_tag(self, obj):
+    #     tags = obj.tags.all()
+    #     return HashTagSerializer(instance=tags, many = True, context=self.context).data
     
     start_time = serializers.TimeField(format="%H:%M")
     end_time = serializers.TimeField(format="%H:%M")
