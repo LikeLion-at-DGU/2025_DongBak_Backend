@@ -26,17 +26,17 @@ class Booth(models.Model):
     booth_name = models.CharField(max_length=50)
     day = models.ManyToManyField(Day)
     location = models.CharField(max_length=30, choices=BOOTH_LOCATION, default='')
-    booth_num = models.IntegerField(unique=True)
+    booth_num = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
     club_logo = models.ImageField(upload_to=image_upload_path, null=True, blank=True)
     club_category = models.CharField(max_length=20)
-    club_description = models.CharField(max_length=250, blank=True, null=True)
-    booth_description = models.CharField(max_length=250, blank=True, null=True)
+    club_description = models.TextField(blank=True, null=True)
+    booth_description = models.TextField(blank=True, null=True)
     start_recruitment = models.DateField()
     end_recruitment = models.DateField()
-    apply_method = models.CharField(max_length=300)
-    insta_url = models.CharField(max_length=200, blank=True, null=True)
+    apply_method = models.TextField()
+    insta_url = models.TextField(blank=True, null=True)
 
 class FoodTruck(models.Model):
     FOODTRUCK_LOCATION = [
@@ -64,7 +64,7 @@ class FoodTruckImage(models.Model):
     food_truck = models.ForeignKey(FoodTruck, on_delete=models.CASCADE, related_name='image')
     image = models.ImageField(upload_to=image_upload_path, null=True, blank=True)
 
-class HashTag(models.Model):
-    id = models.AutoField(primary_key=True)
-    booth = models.ForeignKey(Booth, on_delete=models.CASCADE, related_name='tags')
-    name = models.CharField(max_length=50)
+# class HashTag(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, related_name='tags')
+#     name = models.CharField(max_length=50)
