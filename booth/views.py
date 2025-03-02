@@ -153,7 +153,7 @@ class BoothDataView(APIView):
         # 필수 컬럼 확인
         required_columns = [
             "부스 번호", "동아리명", "부스명", "부스 위치", "부스 시작시간", "부스 종료시간",
-            "동아리 분과", "동아리 설명", "부스 설명", "모집 시작 날짜", "모집 종료 날짜", "지원 방법", "인스타 url", "day"
+            "동아리 분과", "동아리 설명", "부스 설명", "모집 날짜", "지원 방법", "인스타 url", "day"
         ]
         if not all(col in df.columns for col in required_columns):
             return Response({"error": "CSV 파일에 필요한 모든 열이 포함되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
@@ -173,8 +173,9 @@ class BoothDataView(APIView):
                 club_category=row["동아리 분과"],
                 club_description=row["동아리 설명"],
                 booth_description=row["부스 설명"],
-                start_recruitment=row["모집 시작 날짜"],
-                end_recruitment=row["모집 종료 날짜"],
+                recruitment=row["모집 날짜"],
+                # start_recruitment=row["모집 시작 날짜"],
+                # end_recruitment=row["모집 종료 날짜"],
                 apply_method=row["지원 방법"],
                 insta_url=row["인스타 url"]
             )
@@ -193,8 +194,9 @@ class BoothDataView(APIView):
                 "동아리 분과": row["동아리 분과"],
                 "동아리 설명": row["동아리 설명"],
                 "부스 설명": row["부스 설명"],
-                "모집 시작 날짜": row["모집 시작 날짜"],
-                "모집 종료 날짜": row["모집 종료 날짜"],
+                "모집 날짜": row["모집 날짜"],
+                # "모집 시작 날짜": row["모집 시작 날짜"],
+                # "모집 종료 날짜": row["모집 종료 날짜"],
                 "지원 방법": row["지원 방법"],
                 "인스타 url": row["인스타 url"],
                 "day": days 
