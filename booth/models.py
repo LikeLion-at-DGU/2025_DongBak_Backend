@@ -33,8 +33,9 @@ class Booth(models.Model):
     club_category = models.CharField(max_length=20)
     club_description = models.TextField(blank=True, null=True)
     booth_description = models.TextField(blank=True, null=True)
-    start_recruitment = models.DateField()
-    end_recruitment = models.DateField()
+    # start_recruitment = models.DateField(blank=True, null=True)
+    # end_recruitment = models.DateField(blank=True, null=True)
+    recruitment = models.CharField(max_length=150, blank=True, null=True)
     apply_method = models.TextField()
     insta_url = models.TextField(blank=True, null=True)
 

@@ -54,17 +54,17 @@ class BoothSerializer(serializers.ModelSerializer):
     start_time = serializers.TimeField(format="%H:%M")
     end_time = serializers.TimeField(format="%H:%M")
 
-    start_recruitment = serializers.SerializerMethodField()
-    end_recruitment = serializers.SerializerMethodField()
-    def get_start_recruitment(self, obj):
-        if obj.start_recruitment:
-            # 날짜 형식 (월) + 요일을 가져오기
-            return obj.start_recruitment.strftime("%m월 %d일 (%a)").replace("Mon", "월").replace("Tue", "화").replace("Wed", "수").replace("Thu", "목").replace("Fri", "금").replace("Sat", "토").replace("Sun", "일")
-        return None
-    def get_end_recruitment(self, obj):
-        if obj.end_recruitment:
-            return obj.end_recruitment.strftime("%m월 %d일 (%a)").replace("Mon", "월").replace("Tue", "화").replace("Wed", "수").replace("Thu", "목").replace("Fri", "금").replace("Sat", "토").replace("Sun", "일")
-        return None
+    # start_recruitment = serializers.SerializerMethodField()
+    # end_recruitment = serializers.SerializerMethodField()
+    # def get_start_recruitment(self, obj):
+    #     if obj.start_recruitment:
+    #         # 날짜 형식 (월) + 요일을 가져오기
+    #         return obj.start_recruitment.strftime("%m월 %d일 (%a)").replace("Mon", "월").replace("Tue", "화").replace("Wed", "수").replace("Thu", "목").replace("Fri", "금").replace("Sat", "토").replace("Sun", "일")
+    #     return None
+    # def get_end_recruitment(self, obj):
+    #     if obj.end_recruitment:
+    #         return obj.end_recruitment.strftime("%m월 %d일 (%a)").replace("Mon", "월").replace("Tue", "화").replace("Wed", "수").replace("Thu", "목").replace("Fri", "금").replace("Sat", "토").replace("Sun", "일")
+    #     return None
     
     day = serializers.PrimaryKeyRelatedField(
         queryset=Day.objects.all(), many=True, write_only=True
