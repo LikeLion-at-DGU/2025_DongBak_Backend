@@ -2,6 +2,8 @@ from django.conf import settings
 from .models import *
 from rest_framework import serializers
 
+from django.core.exceptions import FieldDoesNotExist
+
 class DaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Day
@@ -70,6 +72,20 @@ class BoothSerializer(serializers.ModelSerializer):
         queryset=Day.objects.all(), many=True, write_only=True
     )
     day_display = DaySerializer(many=True, read_only=True, source="day")
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        for field_name in representation.keys():
+            if field_name in ["booth_image", "club_logo"]:  # `SerializerMethodField`는 모델 필드가 아님
+                continue
+            
+            try:
+                model_field = Booth._meta.get_field(field_name)
+                if isinstance(model_field, models.TextField) and representation[field_name]:
+                    representation[field_name] = representation[field_name].split("\n")
+            except FieldDoesNotExist:
+                continue  # 모델에 없는 필드는 무시
+        return representation
 
 class BoothListSerializer(serializers.ModelSerializer):
     class Meta:

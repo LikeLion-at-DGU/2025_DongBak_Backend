@@ -185,6 +185,9 @@ class BoothDataView(APIView):
                 day_obj, created = Day.objects.get_or_create(name=day_name.strip())
                 booth.day.add(day_obj)
 
+            club_description_list = row["동아리 설명"].split("\n") if isinstance(row["동아리 설명"], str) else []
+            booth_description_list = row["부스 설명"].split("\n") if isinstance(row["부스 설명"], str) else []
+
             booth_data[booth_number] = {
                 "동아리명": row["동아리명"],
                 "부스명": row["부스명"],
@@ -192,8 +195,8 @@ class BoothDataView(APIView):
                 "부스 시작시간": row["부스 시작시간"],
                 "부스 종료시간": row["부스 종료시간"],
                 "동아리 분과": row["동아리 분과"],
-                "동아리 설명": row["동아리 설명"],
-                "부스 설명": row["부스 설명"],
+                "동아리 설명": club_description_list,
+                "부스 설명": booth_description_list,
                 "모집 날짜": row["모집 날짜"],
                 # "모집 시작 날짜": row["모집 시작 날짜"],
                 # "모집 종료 날짜": row["모집 종료 날짜"],
