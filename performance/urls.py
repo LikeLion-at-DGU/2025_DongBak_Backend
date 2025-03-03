@@ -12,5 +12,6 @@ defalut_router = routers.SimpleRouter(trailing_slash=False)
 defalut_router.register("home", PerformanceViewSet, basename="home")
 
 urlpatterns = [
-    path('', include(defalut_router.urls))
+    path('', include(defalut_router.urls)),
+    path('upload-performance-data', PerformanceDataView.as_view(), name='upload_performance_data')
 ]
