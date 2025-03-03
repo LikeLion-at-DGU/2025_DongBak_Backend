@@ -55,7 +55,7 @@ class BoothViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"], url_path=r"(?P<day>\w+)/foodtruck")
     def foodtruck_by_day(self, request, day=None):
         """요일(day)별 푸드트럭 필터링하여 location별 그룹화"""
-        day_map = {"wednesday": "(수)", "thursday": "(목)"}
+        day_map = {"wednesday": 1, "thursday": 2}
         if day not in day_map:
             return Response({"error": "Invalid day"}, status=400)
 
