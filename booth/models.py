@@ -54,6 +54,7 @@ class FoodTruck(models.Model):
     end_time = models.TimeField()
     food_truck_description = models.CharField(max_length=400)
     insta_url = models.URLField(max_length=200, blank=True, null=True)
+    booth_num = models.IntegerField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.id:  # 새 객체인 경우
