@@ -73,6 +73,33 @@ class BoothSerializer(serializers.ModelSerializer):
     )
     day_display = DaySerializer(many=True, read_only=True, source="day")
 
+    club_name_intro = serializers.SerializerMethodField()
+    club_name_with = serializers.SerializerMethodField()
+    
+    def get_josa(self, word, josa1, josa2):
+        """받침 유무에 따라 조사를 선택하는 함수"""
+        if not word:
+            return None
+        
+        last_char = word[-1]  # 마지막 글자 추출
+        last_char_code = ord(last_char)  # 유니코드 변환
+
+        if 0xAC00 <= last_char_code <= 0xD7A3:  # 한글 범위 내인지 확인
+            jongseong = (last_char_code - 0xAC00) % 28  # 종성(받침) 체크
+            return josa2 if jongseong == 0 else josa1  # 받침 없으면 josa2, 받침 있으면 josa1
+        
+        return josa2  # 한글이 아니면 기본적으로 받침 없음 취급
+
+    def get_club_name_intro(self, obj):
+        """'을/를'을 적용한 문장 생성"""
+        josa = self.get_josa(obj.club_name, "을", "를")
+        return f"{obj.club_name}{josa} 소개해요!" if obj.club_name else None
+
+    def get_club_name_with(self, obj):
+        """'와/과'를 적용한 문장 생성"""
+        josa = self.get_josa(obj.club_name, "과", "와")
+        return f"{obj.club_name}{josa} 함께해요!" if obj.club_name else None
+    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         for field_name in representation.keys():
