@@ -53,6 +53,14 @@ jobs:
             echo "🚀 새로운 컨테이너 실행..."
             docker run -d --name dongbak_backend -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/dongbak2025:latest
 
+            # media 폴더를 컨테이너 내부로 복사
+            if [ -d "/home/ubuntu/media" ]; then
+              echo "🔄 media 폴더 컨테이너 내부로 복사..."
+              docker cp /home/ubuntu/media dongbak_backend:/
+            else
+              echo "🚨 /home/ubuntu/media 폴더가 없습니다. Skipping copy."
+            fi
+            
             echo "🛠 데이터베이스 마이그레이션 실행..."
             docker exec dongbak_backend python manage.py migrate
 

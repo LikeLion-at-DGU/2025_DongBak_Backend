@@ -19,14 +19,17 @@ class Performance(models.Model):
     category = models.CharField(max_length=30)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    insta_url = models.CharField(max_length=50)
+    insta_url = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.club_name
 
 class Song(models.Model):
     id = models.AutoField(primary_key=True)
     performance = models.ForeignKey(Performance, on_delete=models.CASCADE, related_name='songs')
-    name = models.CharField(max_length=50)
+    name = models.TextField()
 
 class Member(models.Model):
     id = models.AutoField(primary_key=True)
     performance = models.ForeignKey(Performance, on_delete=models.CASCADE, related_name='members')
-    name = models.CharField(max_length=20)
+    name = models.TextField()
