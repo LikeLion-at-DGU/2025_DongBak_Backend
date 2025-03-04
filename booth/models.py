@@ -39,6 +39,12 @@ class Booth(models.Model):
     apply_method = models.TextField()
     insta_url = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        """
+        Django Admin에서 부스 이름을 대표로 표시하도록 설정
+        """
+        return self.booth_name
+
 class FoodTruck(models.Model):
     FOODTRUCK_LOCATION = [
         (None, ''),
@@ -62,6 +68,12 @@ class FoodTruck(models.Model):
             if last_instance and last_instance.id < 100:
                 self.id = 100
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        """
+        Django Admin에서 푸드트럭 이름을 대표로 표시하도록 설정
+        """
+        return self.food_truck_name
 
 class BoothImage(models.Model):
     id = models.AutoField(primary_key=True)
