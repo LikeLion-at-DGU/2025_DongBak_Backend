@@ -82,7 +82,9 @@ class BoothSerializer(serializers.ModelSerializer):
             try:
                 model_field = Booth._meta.get_field(field_name)
                 if isinstance(model_field, models.TextField) and representation[field_name]:
-                    representation[field_name] = representation[field_name].split("\n")
+                    # 개행 문자 제거 후 리스트 변환
+                    cleaned_text = representation[field_name].replace("\r", "")  # \r 제거
+                    representation[field_name] = cleaned_text.split("\n")  # \n 기준으로 리스트 변환
             except FieldDoesNotExist:
                 continue  # 모델에 없는 필드는 무시
         return representation
