@@ -21,6 +21,9 @@ class Performance(models.Model):
     end_time = models.TimeField()
     insta_url = models.CharField(max_length=200)
 
+    def __str__(self):
+        return self.club_name
+
 class Song(models.Model):
     id = models.AutoField(primary_key=True)
     performance = models.ForeignKey(Performance, on_delete=models.CASCADE, related_name='songs')
