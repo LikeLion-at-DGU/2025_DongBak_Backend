@@ -117,14 +117,12 @@ class SearchView(APIView):
         # Booth 검색 (club_name, booth_name, booth_description)
         booth_results = Booth.objects.filter(
             Q(club_name__icontains=query) |
-            Q(booth_name__icontains=query) |
-            Q(booth_description__icontains=query)
+            Q(booth_name__icontains=query)
         ).distinct()
 
         # FoodTruck 검색 (food_truck_name, food_truck_description)
         food_truck_results = FoodTruck.objects.filter(
-            Q(food_truck_name__icontains=query) |
-            Q(food_truck_description__icontains=query)
+            Q(food_truck_name__icontains=query)
         ).distinct()
 
         booth_serializer = BoothListSerializer(booth_results, context = {'request': request}, many=True)
