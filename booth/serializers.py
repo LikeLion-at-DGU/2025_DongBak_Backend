@@ -125,3 +125,19 @@ class FoodTruckSerializer(serializers.ModelSerializer):
         queryset=Day.objects.all(), many=True, write_only=True
     )
     day_display = DaySerializer(many=True, read_only=True, source="day")
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        for field_name in representation.keys():
+            if field_name in ["food_truck_image"]:  # `SerializerMethodField`는 모델 필드가 아님
+                continue
+            
+            try:
+                model_field = FoodTruck._meta.get_field(field_name)
+                if isinstance(model_field, models.TextField) and representation[field_name]:
+                    # 개행 문자 제거 후 리스트 변환
+                    cleaned_text = representation[field_name].replace("\r", "")  # \r 제거
+                    representation[field_name] = cleaned_text.split("\n")  # \n 기준으로 리스트 변환
+            except FieldDoesNotExist:
+                continue  # 모델에 없는 필드는 무시
+        return representation
