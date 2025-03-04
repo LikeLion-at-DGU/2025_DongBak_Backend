@@ -58,8 +58,7 @@ class FoodTruck(models.Model):
     food_truck_num = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    food_truck_description = models.CharField(max_length=400)
-    insta_url = models.URLField(max_length=200, blank=True, null=True)
+    food_truck_description = models.TextField()
     booth_num = models.IntegerField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
