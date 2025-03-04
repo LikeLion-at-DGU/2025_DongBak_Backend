@@ -51,7 +51,7 @@ class FoodTruck(models.Model):
         ('만해광장', '만해광장'),
         ('팔정도', '팔정도')
     ]
-    id = models.BigAutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     food_truck_name = models.CharField(max_length=50)
     day = models.ManyToManyField(Day)
     location = models.CharField(max_length=30, choices=FOODTRUCK_LOCATION, default='')
@@ -60,13 +60,6 @@ class FoodTruck(models.Model):
     end_time = models.TimeField()
     food_truck_description = models.TextField()
     booth_num = models.IntegerField(blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.id:  # 새 객체인 경우
-            last_instance = FoodTruck.objects.order_by('-id').first()
-            if last_instance and last_instance.id < 100:
-                self.id = 100
-        super().save(*args, **kwargs)
 
     def __str__(self):
         """

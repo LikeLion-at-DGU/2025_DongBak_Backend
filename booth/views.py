@@ -59,7 +59,7 @@ class BoothViewSet(viewsets.ModelViewSet):
         if day not in day_map:
             return Response({"error": "Invalid day"}, status=400)
 
-        food_trucks = FoodTruck.objects.filter(day=day_map[day])
+        food_trucks = FoodTruck.objects.filter(day=day_map[day]).order_by('booth_num')
         serialized_food_trucks = FoodTruckSerializer(food_trucks, many=True, context={'request': request}).data
         return Response(self.group_by_location(serialized_food_trucks))
 
@@ -74,7 +74,7 @@ class BoothViewSet(viewsets.ModelViewSet):
         return grouped_food_trucks
 
 class FoodTruckViewSet(viewsets.ModelViewSet):
-    queryset = FoodTruck.objects.all()
+    queryset = FoodTruck.objects.all().order_by('booth_num')
     serializer_class = FoodTruckSerializer
 
     def list(self, request, *args, **kwargs):
